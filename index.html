@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malaria Classification</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Malaria Cell Classification</h2>
+        <div class="upload-section">
+            <input type="file" id="imageUpload" accept="image/*">
+            <button onclick="predictImage()">Predict</button>
+        </div>
+        <div class="image-preview">
+            <img id="preview" src="" alt="Image Preview">
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById("imageUpload").addEventListener("change", function(event) {
+            let reader = new FileReader();
+            reader.onload = function(){
+                document.getElementById("preview").src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+
+        function predictImage() {
+            let fileInput = document.getElementById("imageUpload").files[0];
+            if (!fileInput) {
+                alert("Please select an image!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", fileInput);
+
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerHTML = <p>Prediction: <strong>${data.prediction}</strong></p>;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
